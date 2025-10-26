@@ -59,7 +59,11 @@ export default function CalculatorPage() {
     }));
   };
 
-  const SectionHeader = ({ title, section, icon: Icon }: any) => (
+  const SectionHeader = ({ title, section, icon: Icon }: { 
+    title: string; 
+    section: keyof typeof expandedSections; 
+    icon: any 
+  }) => (
     <button
       onClick={() => toggleSection(section)}
       className="w-full flex items-center justify-between p-4 bg-nerdio-teal-50 hover:bg-nerdio-teal-100 rounded-lg transition-colors mb-4 group"
@@ -78,8 +82,8 @@ export default function CalculatorPage() {
     </button>
   );
 
-  const handleWorkloadChange = (key: string, value: number) => {
-    const others = Object.entries(workloadMix).filter(([k]) => k !== key);
+  const handleWorkloadChange = (key: keyof typeof workloadMix, value: number) => {
+    const others = Object.entries(workloadMix).filter(([k]) => k !== key) as [keyof typeof workloadMix, number][];
     const othersSum = others.reduce((sum, [_, v]) => sum + v, 0);
     const remaining = 100 - value;
     
@@ -186,8 +190,8 @@ export default function CalculatorPage() {
           </div>
         )}
 
-        {/* Organization Profile */}
-        <SectionHeader title="Organization Profile" section="org" icon={Building2} />
+        {/* Organization Details */}
+        <SectionHeader title="Organization Details" section="org" icon={Building2} />
         {expandedSections.org && (
           <div className="mb-8 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -195,17 +199,15 @@ export default function CalculatorPage() {
                 <label className="input-label">Industry</label>
                 <select
                   value={industry}
-                  onChange={(e) => setIndustry(e.target.value as any)}
+                  onChange={(e) => setIndustry(e.target.value)}
                   className="input"
                 >
-                  <option value="financial">Financial Services</option>
+                  <option value="general">General Business</option>
                   <option value="healthcare">Healthcare</option>
-                  <option value="manufacturing">Manufacturing</option>
-                  <option value="technology">Technology</option>
+                  <option value="finance">Financial Services</option>
                   <option value="education">Education</option>
                   <option value="government">Government</option>
-                  <option value="retail">Retail</option>
-                  <option value="msp">Managed Service Provider</option>
+                  <option value="manufacturing">Manufacturing</option>
                 </select>
               </div>
               <div>
@@ -215,42 +217,43 @@ export default function CalculatorPage() {
                   value={namedUsers}
                   onChange={(e) => setNamedUsers(Number(e.target.value))}
                   className="input"
-                  min="100"
+                  min="1"
                   step="100"
                 />
+                <div className="text-xs text-nerdio-gray-500 mt-1">Total licensed users</div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="input-label">Monthly Active Users (% of Named)</label>
+                <label className="input-label">Monthly Active Users (%)</label>
                 <div className="flex items-center gap-4">
                   <input
                     type="range"
                     min="20"
-                    max="80"
+                    max="100"
                     value={mauPercentage}
                     onChange={(e) => setMauPercentage(Number(e.target.value))}
                     className="flex-1 h-2 bg-nerdio-gray-200 rounded-lg appearance-none cursor-pointer accent-nerdio-teal-500"
                   />
-                  <span className="text-lg font-semibold text-nerdio-teal-600 w-16 text-right">{mauPercentage}%</span>
+                  <span className="input-suffix w-16 text-right">{mauPercentage}%</span>
                 </div>
                 <div className="text-sm text-nerdio-gray-600 mt-2">
                   {mau.toLocaleString()} MAU
                 </div>
               </div>
               <div>
-                <label className="input-label">Concurrent Users (% of MAU)</label>
+                <label className="input-label">Peak Concurrent Users (%)</label>
                 <div className="flex items-center gap-4">
                   <input
                     type="range"
-                    min="15"
-                    max="60"
+                    min="10"
+                    max="50"
                     value={concurrentPercentage}
                     onChange={(e) => setConcurrentPercentage(Number(e.target.value))}
                     className="flex-1 h-2 bg-nerdio-gray-200 rounded-lg appearance-none cursor-pointer accent-nerdio-teal-500"
                   />
-                  <span className="text-lg font-semibold text-nerdio-teal-600 w-16 text-right">{concurrentPercentage}%</span>
+                  <span className="input-suffix w-16 text-right">{concurrentPercentage}%</span>
                 </div>
                 <div className="text-sm text-nerdio-gray-600 mt-2">
                   {ccu.toLocaleString()} CCU
@@ -276,12 +279,12 @@ export default function CalculatorPage() {
         <SectionHeader title="Workload Distribution" section="workload" icon={Users} />
         {expandedSections.workload && (
           <div className="mb-8 space-y-4">
-            {[
+            {([
               { key: 'task', label: 'Task Workers', desc: 'Basic apps, email, web browsing', specs: '2 vCPU, 4GB RAM' },
               { key: 'knowledge', label: 'Knowledge Workers', desc: 'Office suite, CRM, standard apps', specs: '2 vCPU, 8GB RAM' },
               { key: 'power', label: 'Power Users', desc: 'CAD, development, heavy compute', specs: '4 vCPU, 16GB RAM' },
               { key: 'vip', label: 'VIP/Executive', desc: 'Premium performance, dedicated resources', specs: '8 vCPU, 32GB RAM' }
-            ].map(item => (
+            ] as const).map(item => (
               <div key={item.key} className="bg-nerdio-gray-50 p-4 rounded-lg border border-nerdio-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <div>
@@ -319,12 +322,12 @@ export default function CalculatorPage() {
         {expandedSections.costs && (
           <div className="mb-8 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
+              {([
                 { key: 'infrastructure', label: 'Infrastructure', desc: 'Servers, storage, networking, datacenter' },
                 { key: 'licensing', label: 'Licensing', desc: 'Software licenses, support, maintenance' },
                 { key: 'personnel', label: 'Personnel', desc: 'IT staff costs for VDI management' },
                 { key: 'support', label: 'Support & Other', desc: 'Vendor support, consulting, misc costs' }
-              ].map(item => (
+              ] as const).map(item => (
                 <div key={item.key}>
                   <label className="input-label">{item.label}</label>
                   <div className="relative">
