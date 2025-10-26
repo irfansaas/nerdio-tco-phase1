@@ -199,7 +199,7 @@ export default function CalculatorPage() {
                 <label className="input-label">Industry</label>
                 <select
                   value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
+                  onChange={(e) => setIndustry(e.target.value as any)}
                   className="input"
                 >
                   <option value="general">General Business</option>
