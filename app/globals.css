@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --nerdio-teal: #20B2AA;
+    --nerdio-yellow: #B8E631;
+    --nerdio-dark: #0a2540;
+    --nerdio-gray: #64748b;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  * {
+    @apply border-nerdio-gray-200;
+  }
+}
+
+@layer components {
+  /* Nerdio Button Styles */
+  .btn-primary {
+    @apply bg-nerdio-teal-500 hover:bg-nerdio-teal-600 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-nerdio-yellow-500 hover:bg-nerdio-yellow-600 text-nerdio-gray-900 font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
+  }
+
+  .btn-outline {
+    @apply border-2 border-nerdio-teal-500 text-nerdio-teal-500 hover:bg-nerdio-teal-50 font-semibold py-2 px-6 rounded-lg transition-all duration-200;
+  }
+
+  /* Nerdio Card Styles */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-nerdio-gray-200 p-6 transition-all duration-200 hover:shadow-md;
+  }
+
+  .card-interactive {
+    @apply card cursor-pointer hover:border-nerdio-teal-300 hover:scale-[1.01];
+  }
+
+  /* Nerdio Input Styles */
+  .input {
+    @apply w-full px-4 py-2.5 border border-nerdio-gray-300 rounded-lg focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500 transition-all duration-200 bg-white;
+  }
+
+  .input-label {
+    @apply block text-sm font-semibold text-nerdio-gray-700 mb-2;
+  }
+
+  /* Nerdio Badge Styles */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .badge-teal {
+    @apply bg-nerdio-teal-100 text-nerdio-teal-800;
+  }
+
+  .badge-yellow {
+    @apply bg-nerdio-yellow-100 text-nerdio-yellow-900;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+
+  /* Navigation Active State */
+  .nav-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium text-nerdio-gray-600 hover:bg-nerdio-teal-50 hover:text-nerdio-teal-600;
+  }
+
+  .nav-link-active {
+    @apply bg-gradient-to-r from-nerdio-teal-500 to-nerdio-teal-600 text-white shadow-md;
+  }
+
+  /* Section Headers */
+  .section-header {
+    @apply text-2xl font-bold text-nerdio-gray-900 mb-2;
+  }
+
+  .section-subheader {
+    @apply text-nerdio-gray-600 mb-6;
+  }
+
+  /* Stats Display */
+  .stat-card {
+    @apply bg-gradient-to-br from-white to-nerdio-teal-50 rounded-xl p-6 border border-nerdio-teal-200 shadow-sm;
+  }
+
+  .stat-label {
+    @apply text-sm font-medium text-nerdio-gray-600 mb-1;
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold text-nerdio-teal-600;
+  }
+
+  /* Gradient Backgrounds */
+  .gradient-teal {
+    @apply bg-gradient-to-r from-nerdio-teal-500 to-nerdio-teal-600;
+  }
+
+  .gradient-yellow {
+    @apply bg-gradient-to-r from-nerdio-yellow-400 to-nerdio-yellow-500;
+  }
+
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-nerdio-gray-100 rounded-lg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-nerdio-teal-400 rounded-lg hover:bg-nerdio-teal-500;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-full-width {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
