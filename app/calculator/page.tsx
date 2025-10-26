@@ -13,7 +13,14 @@ import {
   AlertCircle,
   TrendingDown,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Shield,
+  HardDrive,
+  Database,
+  Activity,
+  Wrench,
+  Wifi,
+  Sparkles
 } from 'lucide-react';
 
 export default function CalculatorPage() {
@@ -32,6 +39,18 @@ export default function CalculatorPage() {
     setHasM365E3,
     azurePricing,
     setAzurePricing,
+    azureHybridBenefit,
+    setAzureHybridBenefit,
+    includeHardwareRefresh,
+    setIncludeHardwareRefresh,
+    includeBackupDR,
+    setIncludeBackupDR,
+    includeMonitoring,
+    setIncludeMonitoring,
+    includeMaintenance,
+    setIncludeMaintenance,
+    includeBandwidth,
+    setIncludeBandwidth,
     workloadMix,
     setWorkloadMix,
     currentCosts,
@@ -49,6 +68,7 @@ export default function CalculatorPage() {
     workload: true,
     costs: true,
     azure: true,
+    advanced: true, // PHASE 1 NEW
     migration: false
   });
 
@@ -59,11 +79,7 @@ export default function CalculatorPage() {
     }));
   };
 
-  const SectionHeader = ({ title, section, icon: Icon }: { 
-    title: string; 
-    section: keyof typeof expandedSections; 
-    icon: any 
-  }) => (
+  const SectionHeader = ({ title, section, icon: Icon, badge }: any) => (
     <button
       onClick={() => toggleSection(section)}
       className="w-full flex items-center justify-between p-4 bg-nerdio-teal-50 hover:bg-nerdio-teal-100 rounded-lg transition-colors mb-4 group"
@@ -73,6 +89,11 @@ export default function CalculatorPage() {
           <Icon className="w-5 h-5 text-white" />
         </div>
         <h3 className="text-lg font-bold text-nerdio-gray-900">{title}</h3>
+        {badge && (
+          <span className="px-2 py-1 text-xs font-bold bg-nerdio-yellow-500 text-nerdio-gray-900 rounded-md">
+            {badge}
+          </span>
+        )}
       </div>
       {expandedSections[section] ? (
         <ChevronDown className="w-5 h-5 text-nerdio-teal-600" />
@@ -82,8 +103,8 @@ export default function CalculatorPage() {
     </button>
   );
 
-  const handleWorkloadChange = (key: keyof typeof workloadMix, value: number) => {
-    const others = Object.entries(workloadMix).filter(([k]) => k !== key) as [keyof typeof workloadMix, number][];
+  const handleWorkloadChange = (key: string, value: number) => {
+    const others = Object.entries(workloadMix).filter(([k]) => k !== key);
     const othersSum = others.reduce((sum, [_, v]) => sum + v, 0);
     const remaining = 100 - value;
     
@@ -187,46 +208,52 @@ export default function CalculatorPage() {
                 </button>
               ))}
             </div>
+            
+            <div className="bg-nerdio-gray-50 p-4 rounded-lg">
+              <label className="input-label">Industry</label>
+              <select
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value as any)}
+                className="input"
+              >
+                <option value="financial">Financial Services</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="manufacturing">Manufacturing</option>
+                <option value="technology">Technology</option>
+                <option value="education">Education</option>
+                <option value="government">Government</option>
+                <option value="retail">Retail</option>
+                <option value="msp">Managed Service Provider</option>
+              </select>
+            </div>
           </div>
         )}
 
-        {/* Organization Details */}
-        <SectionHeader title="Organization Details" section="org" icon={Building2} />
+        {/* Organization Size */}
+        <SectionHeader title="Organization Size & Usage" section="org" icon={Building2} />
         {expandedSections.org && (
-          <div className="mb-8 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="input-label">Industry</label>
-                <select
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value as any)}
-                  className="input"
-                >
-                  <option value="general">General Business</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="finance">Financial Services</option>
-                  <option value="education">Education</option>
-                  <option value="government">Government</option>
-                  <option value="manufacturing">Manufacturing</option>
-                </select>
-              </div>
-              <div>
-                <label className="input-label">Named Users</label>
-                <input
-                  type="number"
-                  value={namedUsers}
-                  onChange={(e) => setNamedUsers(Number(e.target.value))}
-                  className="input"
-                  min="1"
-                  step="100"
-                />
-                <div className="text-xs text-nerdio-gray-500 mt-1">Total licensed users</div>
-              </div>
+          <div className="mb-8 space-y-6">
+            <div>
+              <label className="input-label">
+                Total Named Users
+                <span className="text-nerdio-gray-500 font-normal ml-2">(All employees with access)</span>
+              </label>
+              <input
+                type="number"
+                value={namedUsers}
+                onChange={(e) => setNamedUsers(Number(e.target.value))}
+                className="input"
+                step="100"
+                min="100"
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="input-label">Monthly Active Users (%)</label>
+                <label className="input-label">
+                  Monthly Active Users %
+                  <span className="text-nerdio-gray-500 font-normal ml-2">(Typical: 45-60%)</span>
+                </label>
                 <div className="flex items-center gap-4">
                   <input
                     type="range"
@@ -236,24 +263,32 @@ export default function CalculatorPage() {
                     onChange={(e) => setMauPercentage(Number(e.target.value))}
                     className="flex-1 h-2 bg-nerdio-gray-200 rounded-lg appearance-none cursor-pointer accent-nerdio-teal-500"
                   />
-                  <span className="input-suffix w-16 text-right">{mauPercentage}%</span>
+                  <div className="text-2xl font-bold text-nerdio-teal-600 w-16 text-right">
+                    {mauPercentage}%
+                  </div>
                 </div>
                 <div className="text-sm text-nerdio-gray-600 mt-2">
                   {mau.toLocaleString()} MAU
                 </div>
               </div>
+
               <div>
-                <label className="input-label">Peak Concurrent Users (%)</label>
+                <label className="input-label">
+                  Peak Concurrent %
+                  <span className="text-nerdio-gray-500 font-normal ml-2">(Typical: 30-40%)</span>
+                </label>
                 <div className="flex items-center gap-4">
                   <input
                     type="range"
                     min="10"
-                    max="50"
+                    max="60"
                     value={concurrentPercentage}
                     onChange={(e) => setConcurrentPercentage(Number(e.target.value))}
                     className="flex-1 h-2 bg-nerdio-gray-200 rounded-lg appearance-none cursor-pointer accent-nerdio-teal-500"
                   />
-                  <span className="input-suffix w-16 text-right">{concurrentPercentage}%</span>
+                  <div className="text-2xl font-bold text-nerdio-teal-600 w-16 text-right">
+                    {concurrentPercentage}%
+                  </div>
                 </div>
                 <div className="text-sm text-nerdio-gray-600 mt-2">
                   {ccu.toLocaleString()} CCU
@@ -279,12 +314,12 @@ export default function CalculatorPage() {
         <SectionHeader title="Workload Distribution" section="workload" icon={Users} />
         {expandedSections.workload && (
           <div className="mb-8 space-y-4">
-            {([
+            {[
               { key: 'task', label: 'Task Workers', desc: 'Basic apps, email, web browsing', specs: '2 vCPU, 4GB RAM' },
               { key: 'knowledge', label: 'Knowledge Workers', desc: 'Office suite, CRM, standard apps', specs: '2 vCPU, 8GB RAM' },
               { key: 'power', label: 'Power Users', desc: 'CAD, development, heavy compute', specs: '4 vCPU, 16GB RAM' },
               { key: 'vip', label: 'VIP/Executive', desc: 'Premium performance, dedicated resources', specs: '8 vCPU, 32GB RAM' }
-            ] as const).map(item => (
+            ].map(item => (
               <div key={item.key} className="bg-nerdio-gray-50 p-4 rounded-lg border border-nerdio-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <div>
@@ -322,12 +357,12 @@ export default function CalculatorPage() {
         {expandedSections.costs && (
           <div className="mb-8 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {([
+              {[
                 { key: 'infrastructure', label: 'Infrastructure', desc: 'Servers, storage, networking, datacenter' },
                 { key: 'licensing', label: 'Licensing', desc: 'Software licenses, support, maintenance' },
                 { key: 'personnel', label: 'Personnel', desc: 'IT staff costs for VDI management' },
                 { key: 'support', label: 'Support & Other', desc: 'Vendor support, consulting, misc costs' }
-              ] as const).map(item => (
+              ].map(item => (
                 <div key={item.key}>
                   <label className="input-label">{item.label}</label>
                   <div className="relative">
@@ -366,9 +401,14 @@ export default function CalculatorPage() {
                   className="input"
                 >
                   <option value="PAYG">Pay-As-You-Go (No discount)</option>
-                  <option value="RI">Reserved Instances (30% discount)</option>
-                  <option value="EA">Enterprise Agreement (40% discount)</option>
+                  <option value="RI-1yr">Reserved Instances 1-Year (-30%)</option>
+                  <option value="RI-3yr">Reserved Instances 3-Year (-50%)</option>
+                  <option value="EA">Enterprise Agreement (-40%)</option>
+                  <option value="EA-Plus">EA + Volume Licensing (-45%)</option>
                 </select>
+                <div className="text-xs text-nerdio-gray-500 mt-2">
+                  Discounts apply to Azure compute costs
+                </div>
               </div>
               <div>
                 <label className="input-label">Microsoft 365 E3/E5 License</label>
@@ -395,10 +435,269 @@ export default function CalculatorPage() {
                   </button>
                 </div>
                 <div className="text-xs text-nerdio-gray-500 mt-2">
-                  {hasM365E3 ? 'AVD rights included' : 'AVD licensing cost will be added'}
+                  {hasM365E3 ? 'AVD rights included - $0 cost' : 'AVD licensing ($15/user/month) will be added'}
                 </div>
               </div>
             </div>
+
+            {/* PHASE 1 NEW: Azure Hybrid Benefit */}
+            <div className="bg-gradient-to-r from-nerdio-yellow-50 to-nerdio-teal-50 p-6 rounded-lg border-2 border-nerdio-yellow-300">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-nerdio-yellow-500 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <label className="text-lg font-bold text-nerdio-gray-900">
+                      Azure Hybrid Benefit
+                    </label>
+                    <button
+                      onClick={() => setAzureHybridBenefit(!azureHybridBenefit)}
+                      className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors ${
+                        azureHybridBenefit ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                          azureHybridBenefit ? 'translate-x-8' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <p className="text-sm text-nerdio-gray-700 mb-2">
+                    Use your existing Windows Server licenses with Software Assurance for <strong>additional 40% savings</strong> on Azure compute costs
+                  </p>
+                  {azureHybridBenefit && (
+                    <div className="flex items-center gap-2 text-nerdio-teal-600 font-medium text-sm">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Enabled - Maximizing Azure savings</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PHASE 1 NEW: Advanced Cost Components */}
+        <SectionHeader 
+          title="Advanced Cost Components" 
+          section="advanced" 
+          icon={Shield}
+          badge="NEW"
+        />
+        {expandedSections.advanced && (
+          <div className="mb-8 space-y-4">
+            <div className="bg-nerdio-teal-50 p-4 rounded-lg border border-nerdio-teal-200 mb-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-nerdio-teal-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="font-medium text-nerdio-teal-900 mb-1">Comprehensive TCO Analysis</div>
+                  <div className="text-sm text-nerdio-teal-700">
+                    Enable these components for a complete view of your total cost of ownership. These represent real costs often hidden in traditional calculations.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Hardware Refresh */}
+              <div className={`p-4 rounded-lg border-2 transition-all ${
+                includeHardwareRefresh ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+                    <HardDrive className="w-5 h-5 text-nerdio-teal-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="font-semibold text-nerdio-gray-900">Hardware Refresh Cycles</label>
+                      <button
+                        onClick={() => setIncludeHardwareRefresh(!includeHardwareRefresh)}
+                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                          includeHardwareRefresh ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            includeHardwareRefresh ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <p className="text-sm text-nerdio-gray-600">
+                      Include Year 4-5 hardware replacement costs (~$480/user amortized)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Backup & DR */}
+              <div className={`p-4 rounded-lg border-2 transition-all ${
+                includeBackupDR ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+                    <Database className="w-5 h-5 text-nerdio-teal-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="font-semibold text-nerdio-gray-900">Backup & DR Infrastructure</label>
+                      <button
+                        onClick={() => setIncludeBackupDR(!includeBackupDR)}
+                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                          includeBackupDR ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            includeBackupDR ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <p className="text-sm text-nerdio-gray-600">
+                      OnPrem: $76/user/year vs Cloud: $7/user/year
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Monitoring Tools */}
+              <div className={`p-4 rounded-lg border-2 transition-all ${
+                includeMonitoring ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+                    <Activity className="w-5 h-5 text-nerdio-teal-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="font-semibold text-nerdio-gray-900">Monitoring Tools</label>
+                      <button
+                        onClick={() => setIncludeMonitoring(!includeMonitoring)}
+                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                          includeMonitoring ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            includeMonitoring ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <p className="text-sm text-nerdio-gray-600">
+                      SCOM, vROps, etc.: $17/user/year vs Nerdio: $4/user/year
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Software Maintenance */}
+              <div className={`p-4 rounded-lg border-2 transition-all ${
+                includeMaintenance ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+                    <Wrench className="w-5 h-5 text-nerdio-teal-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="font-semibold text-nerdio-gray-900">Software Maintenance</label>
+                      <button
+                        onClick={() => setIncludeMaintenance(!includeMaintenance)}
+                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                          includeMaintenance ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            includeMaintenance ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <p className="text-sm text-nerdio-gray-600">
+                      VMware/Citrix support contracts (~22% of licensing)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bandwidth/Egress */}
+              <div className={`p-4 rounded-lg border-2 transition-all md:col-span-2 ${
+                includeBandwidth ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+                    <Wifi className="w-5 h-5 text-nerdio-teal-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="font-semibold text-nerdio-gray-900">Bandwidth & Egress Costs</label>
+                      <button
+                        onClick={() => setIncludeBandwidth(!includeBandwidth)}
+                        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                          includeBandwidth ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            includeBandwidth ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                    <p className="text-sm text-nerdio-gray-600">
+                      Azure data egress (20GB/user/month) + VPN Gateway costs
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Impact Summary */}
+            {calculations && (
+              <div className="bg-gradient-to-r from-nerdio-teal-600 to-nerdio-teal-700 p-6 rounded-lg text-white mt-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <TrendingDown className="w-6 h-6" />
+                  <h4 className="text-lg font-bold">Additional Savings from Advanced Components</h4>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+                  {includeHardwareRefresh && (
+                    <div>
+                      <div className="text-2xl font-bold">${(calculations.current.hardwareRefresh / 1000000).toFixed(2)}M</div>
+                      <div className="text-sm text-nerdio-teal-100">Hardware Refresh</div>
+                    </div>
+                  )}
+                  {includeBackupDR && (
+                    <div>
+                      <div className="text-2xl font-bold">${((calculations.current.backupDR - calculations.future.backupDR) / 1000000).toFixed(2)}M</div>
+                      <div className="text-sm text-nerdio-teal-100">Backup/DR Savings</div>
+                    </div>
+                  )}
+                  {includeMonitoring && (
+                    <div>
+                      <div className="text-2xl font-bold">${((calculations.current.monitoring - calculations.future.monitoring) / 1000000).toFixed(2)}M</div>
+                      <div className="text-sm text-nerdio-teal-100">Monitoring Savings</div>
+                    </div>
+                  )}
+                  {includeMaintenance && (
+                    <div>
+                      <div className="text-2xl font-bold">${(calculations.current.maintenance / 1000000).toFixed(2)}M</div>
+                      <div className="text-sm text-nerdio-teal-100">Maintenance Avoided</div>
+                    </div>
+                  )}
+                  {includeBandwidth && (
+                    <div>
+                      <div className="text-2xl font-bold">-${(calculations.future.bandwidth / 1000000).toFixed(2)}M</div>
+                      <div className="text-sm text-nerdio-teal-100">Bandwidth Cost</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
