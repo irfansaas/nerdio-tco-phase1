@@ -22,6 +22,19 @@ export interface CurrentCosts {
   support: number;
 }
 
+// PHASE 1.5 NEW: Custom cost values interface
+export interface CustomCostValues {
+  hardwareRefreshCost: number;        // per user, amortized over 3 years
+  backupDROnPremCostPerYear: number;  // per user per year
+  backupDRCloudCostPerYear: number;   // per user per year
+  monitoringOnPremCostPerYear: number; // per user per year
+  monitoringCloudCostPerYear: number;  // per user per year
+  maintenancePercentage: number;       // percentage of licensing costs
+  bandwidthGBPerUserPerMonth: number;  // GB per user per month
+  bandwidthCostPerGB: number;          // cost per GB
+  vpnGatewayCostPerMonth: number;      // VPN gateway monthly cost
+}
+
 export interface TCOContextType {
   // Scenario & Organization
   scenario: Scenario;
@@ -54,6 +67,12 @@ export interface TCOContextType {
   setIncludeMaintenance: (include: boolean) => void;
   includeBandwidth: boolean;
   setIncludeBandwidth: (include: boolean) => void;
+  
+  // PHASE 1.5 NEW: Custom cost values
+  customCosts: CustomCostValues;
+  setCustomCosts: (costs: CustomCostValues) => void;
+  updateCustomCost: (key: keyof CustomCostValues, value: number) => void;
+  resetCustomCosts: () => void;
   
   // Workload Mix
   workloadMix: WorkloadMix;
@@ -112,6 +131,19 @@ export interface CalculationResults {
   };
 }
 
+// PHASE 1.5: Default cost values
+const DEFAULT_CUSTOM_COSTS: CustomCostValues = {
+  hardwareRefreshCost: 480,              // $1,200/user every 5 years = $480 amortized over 3 years
+  backupDROnPremCostPerYear: 76,         // $76/user/year for onprem backup/DR
+  backupDRCloudCostPerYear: 7,           // $7/user/year for cloud backup/DR
+  monitoringOnPremCostPerYear: 17,       // $17/user/year for SCOM, vROps, etc.
+  monitoringCloudCostPerYear: 4,         // $4/user/year for Nerdio monitoring
+  maintenancePercentage: 22,             // 22% of licensing costs for maintenance
+  bandwidthGBPerUserPerMonth: 20,        // 20GB per user per month
+  bandwidthCostPerGB: 0.08,              // $0.08 per GB
+  vpnGatewayCostPerMonth: 150,           // $150/month for VPN Gateway
+};
+
 const TCOContext = createContext<TCOContextType | undefined>(undefined);
 
 export const useTCO = () => {
@@ -133,7 +165,7 @@ export const TCOProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Licensing & Pricing
   const [hasM365E3, setHasM365E3] = useState(true);
   const [azurePricing, setAzurePricing] = useState<AzurePricing>('EA');
-  const [azureHybridBenefit, setAzureHybridBenefit] = useState(false); // PHASE 1 NEW
+  const [azureHybridBenefit, setAzureHybridBenefit] = useState(false);
   
   // Advanced Cost Components (PHASE 1 NEW)
   const [includeHardwareRefresh, setIncludeHardwareRefresh] = useState(true);
@@ -141,6 +173,19 @@ export const TCOProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [includeMonitoring, setIncludeMonitoring] = useState(true);
   const [includeMaintenance, setIncludeMaintenance] = useState(true);
   const [includeBandwidth, setIncludeBandwidth] = useState(true);
+  
+  // PHASE 1.5 NEW: Custom cost values
+  const [customCosts, setCustomCosts] = useState<CustomCostValues>(DEFAULT_CUSTOM_COSTS);
+  
+  // PHASE 1.5 NEW: Helper to update individual custom cost
+  const updateCustomCost = (key: keyof CustomCostValues, value: number) => {
+    setCustomCosts(prev => ({ ...prev, [key]: value }));
+  };
+  
+  // PHASE 1.5 NEW: Reset to defaults
+  const resetCustomCosts = () => {
+    setCustomCosts(DEFAULT_CUSTOM_COSTS);
+  };
   
   const [workloadMix, setWorkloadMix] = useState<WorkloadMix>({
     task: 30,
@@ -163,7 +208,7 @@ export const TCOProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const mau = Math.round(namedUsers * (mauPercentage / 100));
   const ccu = Math.round(mau * (concurrentPercentage / 100));
 
-  // Calculate TCO (PHASE 1 ENHANCED)
+  // Calculate TCO (PHASE 1.5 ENHANCED - now uses custom costs)
   const calculations: CalculationResults | null = React.useMemo(() => {
     // Scenario-based multipliers
     const scenarioMultipliers = {
@@ -180,25 +225,24 @@ export const TCOProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const currentPersonnel = currentCosts.personnel * 3;
     const currentSupport = currentCosts.support * 3;
     
-    // PHASE 1 NEW: Additional OnPrem Costs
-    // Hardware Refresh (Year 4-5 requirement, amortized over 3 years)
+    // PHASE 1.5 ENHANCED: Hardware Refresh (uses custom cost)
     const hardwareRefreshCost = includeHardwareRefresh 
-      ? namedUsers * 1200 * 0.4 // $1200/user every 5 years = $480/user over 3 years
+      ? namedUsers * customCosts.hardwareRefreshCost
       : 0;
     
-    // Backup & DR Infrastructure
+    // PHASE 1.5 ENHANCED: Backup & DR Infrastructure (uses custom cost)
     const backupDRCurrentCost = includeBackupDR
-      ? (namedUsers * 76) * 3 // $76/user/year for backup/DR infrastructure
+      ? (namedUsers * customCosts.backupDROnPremCostPerYear) * 3
       : 0;
     
-    // Monitoring Tools (SCOM, vROps, etc.)
+    // PHASE 1.5 ENHANCED: Monitoring Tools (uses custom cost)
     const monitoringCurrentCost = includeMonitoring
-      ? (namedUsers * 17) * 3 // $17/user/year for monitoring tools
+      ? (namedUsers * customCosts.monitoringOnPremCostPerYear) * 3
       : 0;
     
-    // Software Maintenance Contracts (VMware/Citrix support, backup software, etc.)
+    // PHASE 1.5 ENHANCED: Software Maintenance (uses custom percentage)
     const maintenanceCurrentCost = includeMaintenance
-      ? (currentLicense * 0.22) // 22% of licensing cost for annual maintenance
+      ? (currentLicense * (customCosts.maintenancePercentage / 100))
       : 0;
 
     const currentTotal = currentInfra + currentLicense + currentPersonnel + currentSupport + 
@@ -241,20 +285,20 @@ export const TCOProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Support (cloud reduces to ~20% of current)
     const futureSupport = currentSupport * 0.20;
     
-    // PHASE 1 NEW: Cloud-specific costs
-    // Backup & DR (much cheaper in cloud)
+    // PHASE 1.5 ENHANCED: Cloud Backup/DR (uses custom cost)
     const backupDRFutureCost = includeBackupDR
-      ? (namedUsers * 7) * 3 // $7/user/year for Azure backup/DR
+      ? (namedUsers * customCosts.backupDRCloudCostPerYear) * 3
       : 0;
     
-    // Monitoring (included in Nerdio, minimal additional cost)
+    // PHASE 1.5 ENHANCED: Cloud Monitoring (uses custom cost)
     const monitoringFutureCost = includeMonitoring
-      ? (namedUsers * 4) * 3 // $4/user/year for enhanced monitoring
+      ? (namedUsers * customCosts.monitoringCloudCostPerYear) * 3
       : 0;
     
-    // Bandwidth/Egress Costs (PHASE 1 NEW)
+    // PHASE 1.5 ENHANCED: Bandwidth/Egress Costs (uses custom values)
     const bandwidthCost = includeBandwidth
-      ? (namedUsers * 20 * 0.08 * 12 * 3) + (150 * 12 * 3) // 20GB/user/month + VPN Gateway
+      ? (namedUsers * customCosts.bandwidthGBPerUserPerMonth * customCosts.bandwidthCostPerGB * 12 * 3) + 
+        (customCosts.vpnGatewayCostPerMonth * 12 * 3)
       : 0;
 
     const futureTotal = futureInfra + futureLicense + futurePersonnel + futureSupport + 
@@ -308,7 +352,7 @@ export const TCOProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   }, [scenario, namedUsers, mauPercentage, concurrentPercentage, hasM365E3, azurePricing, azureHybridBenefit,
       includeHardwareRefresh, includeBackupDR, includeMonitoring, includeMaintenance, includeBandwidth,
-      workloadMix, currentCosts, migrationSpeed]);
+      workloadMix, currentCosts, migrationSpeed, customCosts]); // PHASE 1.5: Added customCosts dependency
 
   const value: TCOContextType = {
     scenario,
@@ -337,6 +381,10 @@ export const TCOProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIncludeMaintenance,
     includeBandwidth,
     setIncludeBandwidth,
+    customCosts,
+    setCustomCosts,
+    updateCustomCost,
+    resetCustomCosts,
     workloadMix,
     setWorkloadMix,
     currentCosts,
