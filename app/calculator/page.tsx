@@ -29,7 +29,6 @@ import {
 // PHASE 1.5: Customizable Cost Components
 // ============================================
 
-// Component 1: Hardware Refresh with Customization
 const HardwareRefreshToggle = () => {
   const {
     includeHardwareRefresh,
@@ -41,35 +40,40 @@ const HardwareRefreshToggle = () => {
   const [showCustomize, setShowCustomize] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors">
+    <div className={`p-4 rounded-lg border-2 transition-all ${
+      includeHardwareRefresh ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+    }`}>
       {/* Main Toggle Row */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+          <HardDrive className="w-5 h-5 text-nerdio-teal-600" />
+        </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl">💾</span>
-            <h3 className="font-semibold text-gray-900">Hardware Refresh Cycles</h3>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-semibold text-nerdio-gray-900">Hardware Refresh Cycles</label>
+            <button
+              onClick={() => setIncludeHardwareRefresh(!includeHardwareRefresh)}
+              className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                includeHardwareRefresh ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  includeHardwareRefresh ? 'translate-x-7' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-nerdio-gray-600">
             Include Year 4-5 server replacement costs (~${customCosts.hardwareRefreshCost}/user amortized)
           </p>
         </div>
-
-        {/* Toggle Switch */}
-        <label className="relative inline-flex items-center cursor-pointer ml-4">
-          <input
-            type="checkbox"
-            checked={includeHardwareRefresh}
-            onChange={(e) => setIncludeHardwareRefresh(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </label>
       </div>
 
       {/* Customize Button */}
       <button
         onClick={() => setShowCustomize(!showCustomize)}
-        className="mt-3 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+        className="mt-3 flex items-center gap-1 text-sm text-nerdio-teal-600 hover:text-nerdio-teal-700 font-medium"
       >
         {showCustomize ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         {showCustomize ? 'Hide' : 'Customize'} values
@@ -77,12 +81,12 @@ const HardwareRefreshToggle = () => {
 
       {/* Customization Panel (Collapsible) */}
       {showCustomize && (
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 bg-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
+        <div className="mt-4 pt-4 border-t border-nerdio-gray-200 space-y-3 bg-nerdio-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-gray-700 uppercase">Custom Values</p>
+            <p className="text-xs font-semibold text-nerdio-gray-700 uppercase">Custom Values</p>
             <button
               onClick={() => updateCustomCost('hardwareRefreshCost', 480)}
-              className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1"
+              className="text-xs text-nerdio-gray-600 hover:text-nerdio-gray-900 flex items-center gap-1"
             >
               <RotateCcw size={12} />
               Reset to default
@@ -91,23 +95,23 @@ const HardwareRefreshToggle = () => {
 
           {/* Hardware Refresh Cost Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               Hardware Replacement Cost (per user, 3-year amortized)
             </label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">$</span>
+              <span className="text-nerdio-gray-500">$</span>
               <input
                 type="number"
                 value={customCosts.hardwareRefreshCost}
                 onChange={(e) => updateCustomCost('hardwareRefreshCost', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 placeholder="480"
                 min="0"
                 step="10"
               />
-              <span className="text-sm text-gray-500">per user</span>
+              <span className="text-sm text-nerdio-gray-500">per user</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-nerdio-gray-500">
               Default: $480 (based on $1,200 every 5 years)
             </p>
           </div>
@@ -117,7 +121,10 @@ const HardwareRefreshToggle = () => {
   );
 };
 
-// Component 2: Backup & DR with Customization
+// ============================================
+// Component 2: Backup & DR with Nerdio Branding
+// ============================================
+
 const BackupDRToggle = () => {
   const {
     includeBackupDR,
@@ -129,46 +136,53 @@ const BackupDRToggle = () => {
   const [showCustomize, setShowCustomize] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors">
-      <div className="flex items-center justify-between">
+    <div className={`p-4 rounded-lg border-2 transition-all ${
+      includeBackupDR ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+    }`}>
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+          <Database className="w-5 h-5 text-nerdio-teal-600" />
+        </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl">🗄️</span>
-            <h3 className="font-semibold text-gray-900">Backup & DR Infrastructure</h3>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-semibold text-nerdio-gray-900">Backup & DR Infrastructure</label>
+            <button
+              onClick={() => setIncludeBackupDR(!includeBackupDR)}
+              className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                includeBackupDR ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  includeBackupDR ? 'translate-x-7' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-nerdio-gray-600">
             OnPrem: ${customCosts.backupDROnPremCostPerYear}/user/year vs Cloud: ${customCosts.backupDRCloudCostPerYear}/user/year
           </p>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer ml-4">
-          <input
-            type="checkbox"
-            checked={includeBackupDR}
-            onChange={(e) => setIncludeBackupDR(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </label>
       </div>
 
       <button
         onClick={() => setShowCustomize(!showCustomize)}
-        className="mt-3 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+        className="mt-3 flex items-center gap-1 text-sm text-nerdio-teal-600 hover:text-nerdio-teal-700 font-medium"
       >
         {showCustomize ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         {showCustomize ? 'Hide' : 'Customize'} values
       </button>
 
       {showCustomize && (
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 bg-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
+        <div className="mt-4 pt-4 border-t border-nerdio-gray-200 space-y-3 bg-nerdio-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-gray-700 uppercase">Custom Values</p>
+            <p className="text-xs font-semibold text-nerdio-gray-700 uppercase">Custom Values</p>
             <button
               onClick={() => {
                 updateCustomCost('backupDROnPremCostPerYear', 76);
                 updateCustomCost('backupDRCloudCostPerYear', 7);
               }}
-              className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1"
+              className="text-xs text-nerdio-gray-600 hover:text-nerdio-gray-900 flex items-center gap-1"
             >
               <RotateCcw size={12} />
               Reset to defaults
@@ -176,45 +190,45 @@ const BackupDRToggle = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               On-Premises Backup/DR Cost (per user/year)
             </label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">$</span>
+              <span className="text-nerdio-gray-500">$</span>
               <input
                 type="number"
                 value={customCosts.backupDROnPremCostPerYear}
                 onChange={(e) => updateCustomCost('backupDROnPremCostPerYear', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 placeholder="76"
                 min="0"
                 step="1"
               />
-              <span className="text-sm text-gray-500">per user/year</span>
+              <span className="text-sm text-nerdio-gray-500">per user/year</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-nerdio-gray-500">
               Default: $76 (Veeam, storage, replication)
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               Cloud Backup/DR Cost (per user/year)
             </label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">$</span>
+              <span className="text-nerdio-gray-500">$</span>
               <input
                 type="number"
                 value={customCosts.backupDRCloudCostPerYear}
                 onChange={(e) => updateCustomCost('backupDRCloudCostPerYear', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 placeholder="7"
                 min="0"
                 step="0.5"
               />
-              <span className="text-sm text-gray-500">per user/year</span>
+              <span className="text-sm text-nerdio-gray-500">per user/year</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-nerdio-gray-500">
               Default: $7 (Azure Backup, snapshots)
             </p>
           </div>
@@ -224,7 +238,10 @@ const BackupDRToggle = () => {
   );
 };
 
-// Component 3: Monitoring with Customization
+// ============================================
+// Component 3: Monitoring with Nerdio Branding
+// ============================================
+
 const MonitoringToggle = () => {
   const {
     includeMonitoring,
@@ -236,46 +253,53 @@ const MonitoringToggle = () => {
   const [showCustomize, setShowCustomize] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors">
-      <div className="flex items-center justify-between">
+    <div className={`p-4 rounded-lg border-2 transition-all ${
+      includeMonitoring ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+    }`}>
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+          <Activity className="w-5 h-5 text-nerdio-teal-600" />
+        </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl">📊</span>
-            <h3 className="font-semibold text-gray-900">Monitoring Tools</h3>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-semibold text-nerdio-gray-900">Monitoring Tools</label>
+            <button
+              onClick={() => setIncludeMonitoring(!includeMonitoring)}
+              className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                includeMonitoring ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  includeMonitoring ? 'translate-x-7' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-nerdio-gray-600">
             SCOM, vROps, etc.: ${customCosts.monitoringOnPremCostPerYear}/user/year vs Nerdio: ${customCosts.monitoringCloudCostPerYear}/user/year
           </p>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer ml-4">
-          <input
-            type="checkbox"
-            checked={includeMonitoring}
-            onChange={(e) => setIncludeMonitoring(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </label>
       </div>
 
       <button
         onClick={() => setShowCustomize(!showCustomize)}
-        className="mt-3 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+        className="mt-3 flex items-center gap-1 text-sm text-nerdio-teal-600 hover:text-nerdio-teal-700 font-medium"
       >
         {showCustomize ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         {showCustomize ? 'Hide' : 'Customize'} values
       </button>
 
       {showCustomize && (
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 bg-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
+        <div className="mt-4 pt-4 border-t border-nerdio-gray-200 space-y-3 bg-nerdio-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-gray-700 uppercase">Custom Values</p>
+            <p className="text-xs font-semibold text-nerdio-gray-700 uppercase">Custom Values</p>
             <button
               onClick={() => {
                 updateCustomCost('monitoringOnPremCostPerYear', 17);
                 updateCustomCost('monitoringCloudCostPerYear', 4);
               }}
-              className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1"
+              className="text-xs text-nerdio-gray-600 hover:text-nerdio-gray-900 flex items-center gap-1"
             >
               <RotateCcw size={12} />
               Reset to defaults
@@ -283,41 +307,41 @@ const MonitoringToggle = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               On-Premises Monitoring Cost (per user/year)
             </label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">$</span>
+              <span className="text-nerdio-gray-500">$</span>
               <input
                 type="number"
                 value={customCosts.monitoringOnPremCostPerYear}
                 onChange={(e) => updateCustomCost('monitoringOnPremCostPerYear', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 min="0"
                 step="1"
               />
-              <span className="text-sm text-gray-500">per user/year</span>
+              <span className="text-sm text-nerdio-gray-500">per user/year</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">Default: $17 (SCOM, vROps, third-party)</p>
+            <p className="mt-1 text-xs text-nerdio-gray-500">Default: $17 (SCOM, vROps, third-party)</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               Cloud Monitoring Cost (per user/year)
             </label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">$</span>
+              <span className="text-nerdio-gray-500">$</span>
               <input
                 type="number"
                 value={customCosts.monitoringCloudCostPerYear}
                 onChange={(e) => updateCustomCost('monitoringCloudCostPerYear', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 min="0"
                 step="0.5"
               />
-              <span className="text-sm text-gray-500">per user/year</span>
+              <span className="text-sm text-nerdio-gray-500">per user/year</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">Default: $4 (Nerdio insights included)</p>
+            <p className="mt-1 text-xs text-nerdio-gray-500">Default: $4 (Nerdio insights included)</p>
           </div>
         </div>
       )}
@@ -325,7 +349,10 @@ const MonitoringToggle = () => {
   );
 };
 
-// Component 4: Maintenance with Customization
+// ============================================
+// Component 4: Maintenance with Nerdio Branding
+// ============================================
+
 const MaintenanceToggle = () => {
   const {
     includeMaintenance,
@@ -337,43 +364,50 @@ const MaintenanceToggle = () => {
   const [showCustomize, setShowCustomize] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors">
-      <div className="flex items-center justify-between">
+    <div className={`p-4 rounded-lg border-2 transition-all ${
+      includeMaintenance ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+    }`}>
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+          <Wrench className="w-5 h-5 text-nerdio-teal-600" />
+        </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl">🔧</span>
-            <h3 className="font-semibold text-gray-900">Software Maintenance</h3>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-semibold text-nerdio-gray-900">Software Maintenance</label>
+            <button
+              onClick={() => setIncludeMaintenance(!includeMaintenance)}
+              className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                includeMaintenance ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  includeMaintenance ? 'translate-x-7' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-nerdio-gray-600">
             VMware/Citrix support contracts (~{customCosts.maintenancePercentage}% of licensing)
           </p>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer ml-4">
-          <input
-            type="checkbox"
-            checked={includeMaintenance}
-            onChange={(e) => setIncludeMaintenance(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </label>
       </div>
 
       <button
         onClick={() => setShowCustomize(!showCustomize)}
-        className="mt-3 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+        className="mt-3 flex items-center gap-1 text-sm text-nerdio-teal-600 hover:text-nerdio-teal-700 font-medium"
       >
         {showCustomize ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         {showCustomize ? 'Hide' : 'Customize'} values
       </button>
 
       {showCustomize && (
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 bg-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
+        <div className="mt-4 pt-4 border-t border-nerdio-gray-200 space-y-3 bg-nerdio-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-gray-700 uppercase">Custom Values</p>
+            <p className="text-xs font-semibold text-nerdio-gray-700 uppercase">Custom Values</p>
             <button
               onClick={() => updateCustomCost('maintenancePercentage', 22)}
-              className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1"
+              className="text-xs text-nerdio-gray-600 hover:text-nerdio-gray-900 flex items-center gap-1"
             >
               <RotateCcw size={12} />
               Reset to default
@@ -381,7 +415,7 @@ const MaintenanceToggle = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               Annual Maintenance % (of licensing costs)
             </label>
             <div className="flex items-center gap-2">
@@ -389,14 +423,14 @@ const MaintenanceToggle = () => {
                 type="number"
                 value={customCosts.maintenancePercentage}
                 onChange={(e) => updateCustomCost('maintenancePercentage', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 min="0"
                 max="100"
                 step="1"
               />
-              <span className="text-sm text-gray-500">%</span>
+              <span className="text-sm text-nerdio-gray-500">%</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-nerdio-gray-500">
               Default: 22% (typical for VMware/Citrix support)
             </p>
           </div>
@@ -406,7 +440,10 @@ const MaintenanceToggle = () => {
   );
 };
 
-// Component 5: Bandwidth with Customization
+// ============================================
+// Component 5: Bandwidth with Nerdio Branding
+// ============================================
+
 const BandwidthToggle = () => {
   const {
     includeBandwidth,
@@ -418,47 +455,54 @@ const BandwidthToggle = () => {
   const [showCustomize, setShowCustomize] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors">
-      <div className="flex items-center justify-between">
+    <div className={`p-4 rounded-lg border-2 transition-all ${
+      includeBandwidth ? 'border-nerdio-teal-500 bg-nerdio-teal-50' : 'border-nerdio-gray-200 bg-white'
+    }`}>
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-nerdio-teal-100 flex items-center justify-center flex-shrink-0">
+          <Wifi className="w-5 h-5 text-nerdio-teal-600" />
+        </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl">📡</span>
-            <h3 className="font-semibold text-gray-900">Bandwidth & Egress Costs</h3>
+          <div className="flex items-center justify-between mb-2">
+            <label className="font-semibold text-nerdio-gray-900">Bandwidth & Egress Costs</label>
+            <button
+              onClick={() => setIncludeBandwidth(!includeBandwidth)}
+              className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${
+                includeBandwidth ? 'bg-nerdio-teal-500' : 'bg-nerdio-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  includeBandwidth ? 'translate-x-7' : 'translate-x-1'
+                }`}
+              />
+            </button>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-nerdio-gray-600">
             Azure data egress ({customCosts.bandwidthGBPerUserPerMonth}GB/user/month @ ${customCosts.bandwidthCostPerGB}/GB) + VPN Gateway (${customCosts.vpnGatewayCostPerMonth}/mo)
           </p>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer ml-4">
-          <input
-            type="checkbox"
-            checked={includeBandwidth}
-            onChange={(e) => setIncludeBandwidth(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </label>
       </div>
 
       <button
         onClick={() => setShowCustomize(!showCustomize)}
-        className="mt-3 flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+        className="mt-3 flex items-center gap-1 text-sm text-nerdio-teal-600 hover:text-nerdio-teal-700 font-medium"
       >
         {showCustomize ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         {showCustomize ? 'Hide' : 'Customize'} values
       </button>
 
       {showCustomize && (
-        <div className="mt-4 pt-4 border-t border-gray-200 space-y-3 bg-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
+        <div className="mt-4 pt-4 border-t border-nerdio-gray-200 space-y-3 bg-nerdio-gray-50 -mx-4 -mb-4 px-4 pb-4 rounded-b-lg">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-gray-700 uppercase">Custom Values</p>
+            <p className="text-xs font-semibold text-nerdio-gray-700 uppercase">Custom Values</p>
             <button
               onClick={() => {
                 updateCustomCost('bandwidthGBPerUserPerMonth', 20);
                 updateCustomCost('bandwidthCostPerGB', 0.08);
                 updateCustomCost('vpnGatewayCostPerMonth', 150);
               }}
-              className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1"
+              className="text-xs text-nerdio-gray-600 hover:text-nerdio-gray-900 flex items-center gap-1"
             >
               <RotateCcw size={12} />
               Reset to defaults
@@ -466,7 +510,7 @@ const BandwidthToggle = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               Data Transfer (GB per user/month)
             </label>
             <div className="flex items-center gap-2">
@@ -474,51 +518,51 @@ const BandwidthToggle = () => {
                 type="number"
                 value={customCosts.bandwidthGBPerUserPerMonth}
                 onChange={(e) => updateCustomCost('bandwidthGBPerUserPerMonth', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 min="0"
                 step="5"
               />
-              <span className="text-sm text-gray-500">GB/user/month</span>
+              <span className="text-sm text-nerdio-gray-500">GB/user/month</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">Default: 20GB (typical for office workers)</p>
+            <p className="mt-1 text-xs text-nerdio-gray-500">Default: 20GB (typical for office workers)</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               Azure Egress Cost (per GB)
             </label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">$</span>
+              <span className="text-nerdio-gray-500">$</span>
               <input
                 type="number"
                 value={customCosts.bandwidthCostPerGB}
                 onChange={(e) => updateCustomCost('bandwidthCostPerGB', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 min="0"
                 step="0.01"
               />
-              <span className="text-sm text-gray-500">per GB</span>
+              <span className="text-sm text-nerdio-gray-500">per GB</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">Default: $0.08 (Azure egress pricing)</p>
+            <p className="mt-1 text-xs text-nerdio-gray-500">Default: $0.08 (Azure egress pricing)</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-nerdio-gray-700 mb-1">
               VPN Gateway Cost (monthly)
             </label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">$</span>
+              <span className="text-nerdio-gray-500">$</span>
               <input
                 type="number"
                 value={customCosts.vpnGatewayCostPerMonth}
                 onChange={(e) => updateCustomCost('vpnGatewayCostPerMonth', parseFloat(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-nerdio-gray-300 rounded-md focus:ring-2 focus:ring-nerdio-teal-500 focus:border-nerdio-teal-500"
                 min="0"
                 step="10"
               />
-              <span className="text-sm text-gray-500">per month</span>
+              <span className="text-sm text-nerdio-gray-500">per month</span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">Default: $150 (VPN Gateway SKU)</p>
+            <p className="mt-1 text-xs text-nerdio-gray-500">Default: $150 (VPN Gateway SKU)</p>
           </div>
         </div>
       )}
