@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useTCO } from '@/contexts/TCOContext';
+import { useTCO, WorkloadMix, CurrentCosts } from '@/contexts/TCOContext';
 import {
   Target,
   Building2,
@@ -662,10 +662,10 @@ const SectionHeader = ({
     </button>
   );
 
-const handleWorkloadChange = (key: string, value: number) => {
+const handleWorkloadChange = (key: keyof WorkloadMix, value: number) => {
   const newMix = { ...workloadMix };
-  const oldValue = newMix[key as keyof WorkloadMix];
-  newMix[key as keyof WorkloadMix] = value;
+  const oldValue = newMix[key];
+  newMix[key] = value;
   
   const remaining = 100 - value;
   const others = Object.entries(newMix).filter(([k]) => k !== key);
@@ -886,16 +886,16 @@ const handleWorkloadChange = (key: string, value: number) => {
                     <div className="text-sm text-nerdio-gray-600">{item.desc}</div>
                     <div className="text-xs text-nerdio-gray-500 mt-1">{item.specs}</div>
                   </div>
-                  <div className="text-2xl font-bold text-nerdio-teal-600 w-20 text-right">
-                    {workloadMix[item.key]}%
-                  </div>
+<div className="text-2xl font-bold text-nerdio-teal-600 w-20 text-right">
+  {workloadMix[item.key as keyof WorkloadMix]}%  // ← FIXED
+</div>
                 </div>
                 <input
                   type="range"
                   min="0"
                   max="100"
-                  value={workloadMix[item.key]}
-                  onChange={(e) => handleWorkloadChange(item.key, Number(e.target.value))}
+                  value={workloadMix[item.key as keyof WorkloadMix]}
+                  onChange={(e) => handleWorkloadChange(item.key as keyof WorkloadMix, Number(e.target.value))}
                   className="w-full h-2 bg-nerdio-gray-200 rounded-lg appearance-none cursor-pointer accent-nerdio-teal-500"
                 />
               </div>
@@ -928,8 +928,8 @@ const handleWorkloadChange = (key: string, value: number) => {
                     <span className="absolute left-3 top-3 text-nerdio-gray-500">$</span>
                     <input
                       type="number"
-                      value={currentCosts[item.key]}
-                      onChange={(e) => setCurrentCosts({ ...currentCosts, [item.key]: Number(e.target.value) })}
+                      value={currentCosts[item.key as keyof CurrentCosts]}
+                      onChange={(e) => setCurrentCosts({ ...currentCosts, [item.key as keyof CurrentCosts]: Number(e.target.value) })}
                       className="input pl-8"
                       step="10000"
                     />
