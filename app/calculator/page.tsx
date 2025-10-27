@@ -662,22 +662,22 @@ const SectionHeader = ({
     </button>
   );
 
-  const handleWorkloadChange = (key: string, value: number) => {
-    const others = Object.entries(workloadMix).filter(([k]) => k !== key);
-    const othersSum = others.reduce((sum, [_, v]) => sum + v, 0);
-    const remaining = 100 - value;
-    
-    if (othersSum === 0) return;
-    
-    const ratio = remaining / othersSum;
-    const newMix = { ...workloadMix, [key]: value };
-    
-    others.forEach(([k, v]) => {
-      newMix[k] = Math.round(v * ratio);
-    });
-    
-    setWorkloadMix(newMix);
-  };
+const handleWorkloadChange = (key: string, value: number) => {
+  const newMix = { ...workloadMix };
+  const oldValue = newMix[key as keyof WorkloadMix];
+  newMix[key as keyof WorkloadMix] = value;
+  
+  const remaining = 100 - value;
+  const others = Object.entries(newMix).filter(([k]) => k !== key);
+  const otherTotal = others.reduce((sum, [, v]) => sum + v, 0) - oldValue;
+  const ratio = otherTotal > 0 ? remaining / otherTotal : 0;
+
+  others.forEach(([k, v]) => {
+    newMix[k as keyof WorkloadMix] = Math.round(v * ratio);
+  });
+
+  setWorkloadMix(newMix);
+};
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
