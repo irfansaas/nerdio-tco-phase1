@@ -626,7 +626,19 @@ export default function CalculatorPage() {
     }));
   };
 
-  const SectionHeader = ({ title, section, icon: Icon, badge }: any) => (
+type SectionKey = 'scenario' | 'org' | 'workload' | 'costs' | 'azure' | 'advanced' | 'migration';
+
+const SectionHeader = ({ 
+  title, 
+  section, 
+  icon: Icon, 
+  badge 
+}: { 
+  title: string; 
+  section: SectionKey; 
+  icon: any; 
+  badge?: string;
+}) => (
     <button
       onClick={() => toggleSection(section)}
       className="w-full flex items-center justify-between p-4 bg-nerdio-teal-50 hover:bg-nerdio-teal-100 rounded-lg transition-colors mb-4 group"
